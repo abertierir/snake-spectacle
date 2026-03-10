@@ -1,0 +1,260 @@
+openapi: 3.0.3
+info:
+  title: Snake Spectacle API
+  version: 1.0.0
+  description: API for the Snake Spectacle game including authentication, leaderboard, and live player tracking.
+servers:
+  - url: /api
+    description: Base API URL
+paths:
+  /auth/login:
+    post:
+      summary: Log in
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - email
+                - password
+              properties:
+                email:
+                  type: string
+                  format: email
+                password:
+                  type: string
+      responses:
+        '200':
+          description: Successful login
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AuthResponse'
+  /auth/signup:
+    post:
+      summary: Sign up
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - username
+                - email
+                - password
+              properties:
+                username:
+                  type: string
+                email:
+                  type: string
+                  format: email
+                password:
+                  type: string
+      responses:
+        '200':
+          description: Successful signup
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AuthResponse'
+  /auth/logout:
+    post:
+      summary: Log out
+      responses:
+        '200':
+          description: Successful logout
+  /auth/me:
+    get:
+      summary: Get current authenticated user
+      responses:
+        '200':
+          description: Current user information
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/User'
+        '401':
+          description: Not authenticated
+  /leaderboard:
+    get:
+      summary: Get leaderboard entries
+      parameters:
+        - name: mode
+          in: query
+          required: false
+          schema:
+            $ref: '#/components/schemas/GameMode'
+      responses:
+        '200':
+          description: Leaderboard entries matching the optional mode
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/LeaderboardEntry'
+    post:
+      summary: Submit a score
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/SubmitScorePayload'
+      responses:
+        '201':
+          description: Score submitted successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/LeaderboardEntry'
+  /live/players:
+    get:
+      summary: Get all live players
+      responses:
+        '200':
+          description: List of live players
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/LivePlayer'
+  /live/players/{id}:
+    get:
+      summary: Get a specific live player by ID
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Live player information
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/LivePlayer'
+        '404':
+          description: Player not found
+
+components:
+  schemas:
+    GameMode:
+      type: string
+      enum:
+        - pass-through
+        - walls
+    Direction:
+      type: string
+      enum:
+        - UP
+        - DOWN
+        - LEFT
+        - RIGHT
+    Position:
+      type: object
+      required:
+        - x
+        - y
+      properties:
+        x:
+          type: integer
+        y:
+          type: integer
+    User:
+      type: object
+      required:
+        - id
+        - username
+        - email
+      properties:
+        id:
+          type: string
+          format: uuid
+        username:
+          type: string
+        email:
+          type: string
+          format: email
+    AuthResponse:
+      type: object
+      properties:
+        user:
+          $ref: '#/components/schemas/User'
+          nullable: true
+        error:
+          type: string
+          nullable: true
+    LeaderboardEntry:
+      type: object
+      required:
+        - id
+        - userId
+        - username
+        - score
+        - mode
+        - date
+      properties:
+        id:
+          type: string
+          format: uuid
+        userId:
+          type: string
+        username:
+          type: string
+        score:
+          type: integer
+        mode:
+          $ref: '#/components/schemas/GameMode'
+        date:
+          type: string
+          format: date
+    LivePlayer:
+      type: object
+      required:
+        - id
+        - username
+        - mode
+        - score
+        - snake
+        - food
+        - direction
+        - isAlive
+      properties:
+        id:
+          type: string
+          format: uuid
+        username:
+          type: string
+        mode:
+          $ref: '#/components/schemas/GameMode'
+        score:
+          type: integer
+        snake:
+          type: array
+          items:
+            $ref: '#/components/schemas/Position'
+        food:
+          $ref: '#/components/schemas/Position'
+        direction:
+          $ref: '#/components/schemas/Direction'
+        isAlive:
+          type: boolean
+    SubmitScorePayload:
+      type: object
+      required:
+        - userId
+        - score
+        - mode
+      properties:
+        userId:
+          type: string
+        score:
+          type: integer
+        mode:
+          $ref: '#/components/schemas/GameMode'
