@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { leaderboardApi } from '@/api/mockApi';
+import { leaderboardApi } from '@/api/client';
 import { GameMode, LeaderboardEntry } from '@/api/types';
 import { Trophy } from 'lucide-react';
 
@@ -31,11 +31,10 @@ export default function Leaderboard() {
           <button
             key={f}
             onClick={() => setFilter(f)}
-            className={`px-3 py-1.5 rounded-md text-xs font-mono transition-all ${
-              filter === f
+            className={`px-3 py-1.5 rounded-md text-xs font-mono transition-all ${filter === f
                 ? 'bg-primary text-primary-foreground neon-box'
                 : 'bg-muted text-muted-foreground hover:bg-muted/80'
-            }`}
+              }`}
           >
             {f === 'all' ? 'All' : f === 'pass-through' ? '🌀 Pass-Through' : '🧱 Walls'}
           </button>
@@ -64,9 +63,8 @@ export default function Leaderboard() {
                   </td>
                   <td className="px-4 py-3 font-mono text-sm text-foreground">{entry.username}</td>
                   <td className="px-4 py-3">
-                    <span className={`text-xs font-mono px-2 py-0.5 rounded ${
-                      entry.mode === 'walls' ? 'bg-accent/10 text-accent' : 'bg-secondary/10 text-secondary'
-                    }`}>
+                    <span className={`text-xs font-mono px-2 py-0.5 rounded ${entry.mode === 'walls' ? 'bg-accent/10 text-accent' : 'bg-secondary/10 text-secondary'
+                      }`}>
                       {entry.mode}
                     </span>
                   </td>

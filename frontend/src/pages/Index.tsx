@@ -3,7 +3,7 @@ import { useSnakeGame } from '@/hooks/useSnakeGame';
 import { GameCanvas } from '@/components/game/GameCanvas';
 import { GameMode } from '@/api/types';
 import { useAuth } from '@/hooks/useAuth';
-import { leaderboardApi } from '@/api/mockApi';
+import { leaderboardApi } from '@/api/client';
 import { toast } from 'sonner';
 
 export default function Index() {
@@ -33,11 +33,10 @@ export default function Index() {
           <button
             key={m}
             onClick={() => { if (!game.isRunning) { setMode(m); game.reset(); } }}
-            className={`px-4 py-2 rounded-md text-sm font-mono transition-all ${
-              mode === m
-                ? 'bg-primary text-primary-foreground neon-box'
-                : 'bg-muted text-muted-foreground hover:bg-muted/80'
-            }`}
+            className={`px-4 py-2 rounded-md text-sm font-mono transition-all ${mode === m
+              ? 'bg-primary text-primary-foreground neon-box'
+              : 'bg-muted text-muted-foreground hover:bg-muted/80'
+              }`}
           >
             {m === 'pass-through' ? '🌀 Pass-Through' : '🧱 Walls'}
           </button>

@@ -1,5 +1,5 @@
 import { describe, it, expect, beforeEach } from 'vitest';
-import { authApi, leaderboardApi, liveApi } from '@/api/mockApi';
+import { authApi, leaderboardApi, liveApi } from '@/api/client';
 
 describe('authApi', () => {
   // Note: authApi uses module-level state, so order matters

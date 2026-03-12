@@ -1,5 +1,5 @@
 import React, { useEffect, useState, useRef } from 'react';
-import { liveApi } from '@/api/mockApi';
+import { liveApi } from '@/api/client';
 import { LivePlayer } from '@/api/types';
 import { GameCanvas } from '@/components/game/GameCanvas';
 import { Eye, ArrowLeft } from 'lucide-react';
@@ -51,9 +51,8 @@ export default function Watch() {
           <div className="text-center mb-2">
             <span className="font-mono text-secondary cyan-text text-lg">{watchedPlayer.username}</span>
             <div className="flex items-center gap-4 justify-center mt-1">
-              <span className={`text-xs font-mono px-2 py-0.5 rounded ${
-                watchedPlayer.mode === 'walls' ? 'bg-accent/10 text-accent' : 'bg-secondary/10 text-secondary'
-              }`}>{watchedPlayer.mode}</span>
+              <span className={`text-xs font-mono px-2 py-0.5 rounded ${watchedPlayer.mode === 'walls' ? 'bg-accent/10 text-accent' : 'bg-secondary/10 text-secondary'
+                }`}>{watchedPlayer.mode}</span>
               <span className="font-mono text-sm">Score: <span className="text-primary">{watchedPlayer.score}</span></span>
               <span className={`text-xs font-mono ${watchedPlayer.isAlive ? 'text-primary' : 'text-destructive'}`}>
                 {watchedPlayer.isAlive ? '● LIVE' : '● DEAD'}
@@ -82,9 +81,8 @@ export default function Watch() {
                 <span className="font-mono text-foreground group-hover:text-primary transition-colors">{p.username}</span>
               </div>
               <div className="flex items-center gap-4">
-                <span className={`text-xs font-mono px-2 py-0.5 rounded ${
-                  p.mode === 'walls' ? 'bg-accent/10 text-accent' : 'bg-secondary/10 text-secondary'
-                }`}>{p.mode}</span>
+                <span className={`text-xs font-mono px-2 py-0.5 rounded ${p.mode === 'walls' ? 'bg-accent/10 text-accent' : 'bg-secondary/10 text-secondary'
+                  }`}>{p.mode}</span>
                 <span className="font-mono text-sm text-primary">{p.score}</span>
                 <Eye size={14} className="text-muted-foreground group-hover:text-primary transition-colors" />
               </div>
