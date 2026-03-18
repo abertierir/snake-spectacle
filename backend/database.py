@@ -1,32 +1,32 @@
-import uuid
-from datetime import date
-from models import User, LeaderboardEntry, GameMode
+import os
+from sqlalchemy import create_engine
+from sqlalchemy.orm import sessionmaker
+from models import Base
 
-# Mock Database
+# By default use SQLite if no DATABASE_URL is provided
+SQLALCHEMY_DATABASE_URL = os.getenv("DATABASE_URL", "sqlite:///./sql_app.db")
+
+# For SQLite, we need connect_args={"check_same_thread": False}
+if SQLALCHEMY_DATABASE_URL.startswith("sqlite"):
+    engine = create_engine(
+        SQLALCHEMY_DATABASE_URL, connect_args={"check_same_thread": False}
+    )
+else:
+    engine = create_engine(SQLALCHEMY_DATABASE_URL)
+
+SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
+
+# We still need a dictionary for live players as it's in-memory game state
 mock_db = {
-    "users": {}, # id -> User
-    "users_by_email": {}, # email -> {password, user}
-    "leaderboard": [], # List[LeaderboardEntry]
-    "live_players": {} # id -> LivePlayer
+    "live_players": {}
 }
 
-# Add some fake mocked users
-user1_id = uuid.uuid4()
-user2_id = uuid.uuid4()
-user3_id = uuid.uuid4()
+# Create tables if they don't exist
+Base.metadata.create_all(bind=engine)
 
-user1 = User(id=user1_id, username="snake_master", email="snake@example.com")
-user2 = User(id=user2_id, username="gamer_pro", email="gamer@example.com")
-user3 = User(id=user3_id, username="noob_guy", email="noob@example.com")
-
-for u in [user1, user2, user3]:
-    mock_db["users"][str(u.id)] = u
-    mock_db["users_by_email"][u.email] = {"password": "password123", "user": u}
-
-# Add some fake leaderboard entries
-mock_db["leaderboard"].extend([
-    LeaderboardEntry(id=uuid.uuid4(), userId=str(user1_id), username=user1.username, score=1500, mode=GameMode.walls, date=date.today()),
-    LeaderboardEntry(id=uuid.uuid4(), userId=str(user2_id), username=user2.username, score=1200, mode=GameMode.pass_through, date=date.today()),
-    LeaderboardEntry(id=uuid.uuid4(), userId=str(user3_id), username=user3.username, score=300, mode=GameMode.walls, date=date.today()),
-    LeaderboardEntry(id=uuid.uuid4(), userId=str(user1_id), username=user1.username, score=2500, mode=GameMode.pass_through, date=date.today()),
-])
+def get_db():
+    db = SessionLocal()
+    try:
+        yield db
+    finally:
+        db.close()

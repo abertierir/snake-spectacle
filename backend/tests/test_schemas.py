@@ -1,4 +1,4 @@
-from models import User, GameMode, Position, Direction
+from schemas import User, GameMode, Position, Direction
 import uuid
 
 def test_user_creation():

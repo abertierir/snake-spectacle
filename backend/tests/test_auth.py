@@ -1,19 +1,6 @@
 import pytest
-from fastapi.testclient import TestClient
-from main import app
-from database import mock_db
 
-client = TestClient(app)
-
-@pytest.fixture(autouse=True)
-def reset_db():
-    mock_db["users"].clear()
-    mock_db["users_by_email"].clear()
-    mock_db["leaderboard"].clear()
-    mock_db["live_players"].clear()
-    yield
-
-def test_signup_and_login():
+def test_signup_and_login(client):
     # Test Signup
     res = client.post("/api/auth/signup", json={
         "username": "testuser",
@@ -51,7 +38,7 @@ def test_signup_and_login():
     assert res4.status_code == 200
     assert res4.json()["error"] == "Invalid email or password"
 
-def test_logout_and_me():
+def test_logout_and_me(client):
     res = client.post("/api/auth/logout")
     assert res.status_code == 200
     

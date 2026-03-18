@@ -1,68 +1,26 @@
-from pydantic import BaseModel, EmailStr
-from typing import List, Optional
-from enum import Enum
 import uuid
-from datetime import date
+from sqlalchemy import Column, String, Integer, Date, Enum as SQLEnum
+from sqlalchemy.orm import declarative_base
 
-# Defined GameMode enum
-class GameMode(str, Enum):
-    pass_through = "pass-through"
-    walls = "walls"
+from schemas import GameMode
 
-# Defined Direction enum
-class Direction(str, Enum):
-    UP = "UP"
-    DOWN = "DOWN"
-    LEFT = "LEFT"
-    RIGHT = "RIGHT"
+Base = declarative_base()
 
-# Defined Position
-class Position(BaseModel):
-    x: int
-    y: int
+def generate_uuid():
+    return str(uuid.uuid4())
 
-# Defined User
-class User(BaseModel):
-    id: uuid.UUID
-    username: str
-    email: EmailStr
+class User(Base):
+    __tablename__ = 'users'
+    id = Column(String, primary_key=True, default=generate_uuid)
+    username = Column(String, unique=True, index=True, nullable=False)
+    email = Column(String, unique=True, index=True, nullable=False)
+    hashed_password = Column(String, nullable=False)
 
-class LoginRequest(BaseModel):
-    email: EmailStr
-    password: str
-
-class SignupRequest(BaseModel):
-    username: str
-    email: EmailStr
-    password: str
-
-# Defined AuthResponse
-class AuthResponse(BaseModel):
-    user: Optional[User] = None
-    error: Optional[str] = None
-
-# Defined LeaderboardEntry
-class LeaderboardEntry(BaseModel):
-    id: uuid.UUID
-    userId: str
-    username: str
-    score: int
-    mode: Optional[GameMode] = None
-    date: date
-
-# Defined LivePlayer
-class LivePlayer(BaseModel):
-    id: uuid.UUID
-    username: str
-    mode: GameMode
-    score: int
-    snake: List[Position]
-    food: Position
-    direction: Direction
-    isAlive: bool
-
-# Defined SubmitScorePayload
-class SubmitScorePayload(BaseModel):
-    userId: str
-    score: int
-    mode: GameMode
+class LeaderboardEntry(Base):
+    __tablename__ = 'leaderboard'
+    id = Column(String, primary_key=True, default=generate_uuid)
+    userId = Column(String, index=True, nullable=False)
+    username = Column(String, nullable=False)
+    score = Column(Integer, index=True, nullable=False)
+    mode = Column(SQLEnum(GameMode), nullable=True)
+    date = Column(Date, nullable=False)

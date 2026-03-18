@@ -1,24 +1,14 @@
 import pytest
-from fastapi.testclient import TestClient
-from main import app
-from database import mock_db
 import uuid
+from database import mock_db
+from models import User
 
-client = TestClient(app)
-
-@pytest.fixture(autouse=True)
-def reset_db():
-    mock_db["users"].clear()
-    mock_db["users_by_email"].clear()
-    mock_db["leaderboard"].clear()
-    mock_db["live_players"].clear()
-    yield
-
-
-def test_leaderboard():
+def test_leaderboard(client, db_session):
     user_id = str(uuid.uuid4())
-    from models import User
-    mock_db["users"][user_id] = User(id=uuid.UUID(user_id), username='test_user', email='a@b.com')
+    # create a user directly in the test database
+    new_user = User(id=user_id, username='test_user', email='a@b.com', hashed_password='password')
+    db_session.add(new_user)
+    db_session.commit()
     
     # Submit score
     res = client.post("/api/leaderboard", json={
@@ -40,7 +30,7 @@ def test_leaderboard():
     assert res3.status_code == 200
     assert len(res3.json()) == 0
     
-def test_live_players():
+def test_live_players(client):
     player_id = str(uuid.uuid4())
     mock_db["live_players"][player_id] = {
         "id": player_id,
