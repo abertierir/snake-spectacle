@@ -5,6 +5,9 @@ from models import Base
 
 # By default use SQLite if no DATABASE_URL is provided
 SQLALCHEMY_DATABASE_URL = os.getenv("DATABASE_URL", "sqlite:///./sql_app.db")
+# Fix for PaaS providers (like Render) that use `postgres://` instead of `postgresql://`
+if SQLALCHEMY_DATABASE_URL.startswith("postgres://"):
+    SQLALCHEMY_DATABASE_URL = SQLALCHEMY_DATABASE_URL.replace("postgres://", "postgresql+psycopg://", 1)
 
 # For SQLite, we need connect_args={"check_same_thread": False}
 if SQLALCHEMY_DATABASE_URL.startswith("sqlite"):
