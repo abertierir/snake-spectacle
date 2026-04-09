@@ -13,8 +13,8 @@ services:
     volumes:
       - postgres_data:/var/lib/postgresql/data
 
-  backend:
-    build: ./backend
+  app:
+    build: .
     restart: always
     environment:
       DATABASE_URL: "postgresql+psycopg://postgres:postgrespassword@db:5432/snakedb"
@@ -22,14 +22,6 @@ services:
       - "8000:8000"
     depends_on:
       - db
-
-  frontend:
-    build: ./frontend
-    restart: always
-    ports:
-      - "3000:80"
-    depends_on:
-      - backend
 
 volumes:
   postgres_data:

@@ -3,6 +3,9 @@ from typing import List, Optional
 import uuid
 from datetime import date
 from sqlalchemy.orm import Session
+from pathlib import Path
+from fastapi.responses import FileResponse
+from fastapi.staticfiles import StaticFiles
 
 from schemas import (
     GameMode, LeaderboardEntry as LeaderboardEntrySchema, LivePlayer, SubmitScorePayload
@@ -69,3 +72,23 @@ def get_live_player(id: str):
     if id not in mock_db["live_players"]:
         raise HTTPException(status_code=404, detail="Player not found")
     return mock_db["live_players"][id]
+
+frontend_dist = Path(__file__).parent / "dist"
+
+if (frontend_dist / "assets").exists():
+    app.mount("/assets", StaticFiles(directory=str(frontend_dist / "assets")), name="assets")
+
+@app.get("/{full_path:path}")
+async def serve_frontend(full_path: str):
+    if full_path.startswith("api/"):
+        raise HTTPException(status_code=404, detail="API route not found")
+        
+    file_path = frontend_dist / full_path
+    if file_path.is_file():
+        return FileResponse(file_path)
+    
+    index_path = frontend_dist / "index.html"
+    if index_path.is_file():
+        return FileResponse(index_path)
+        
+    return FileResponse(index_path) if index_path.exists() else {"error": "Frontend build not found", "status_code": 404}
