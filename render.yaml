@@ -9,6 +9,8 @@ services:
         fromDatabase:
           name: snake-spectacle-db
           property: connectionString
+      - key: PORT
+        value: "8000"
 
 databases:
   - name: snake-spectacle-db
