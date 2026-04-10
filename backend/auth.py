@@ -24,9 +24,13 @@ def login(request: LoginRequest, db: Session = Depends(get_db)):
 
 @router.post("/signup", response_model=AuthResponse)
 def signup(request: SignupRequest, db: Session = Depends(get_db)):
-    db_user = db.query(UserModel).filter(UserModel.email == request.email).first()
-    if db_user:
+    db_user_email = db.query(UserModel).filter(UserModel.email == request.email).first()
+    if db_user_email:
         return AuthResponse(error="Email already exists")
+        
+    db_user_username = db.query(UserModel).filter(UserModel.username == request.username).first()
+    if db_user_username:
+        return AuthResponse(error="Username already taken")
     
     new_user = UserModel(
         username=request.username,

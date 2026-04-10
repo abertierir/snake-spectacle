@@ -16,7 +16,7 @@ describe('authApi', () => {
 
   it('signup rejects duplicate email', async () => {
     const res = await authApi.signup('other', testEmail, 'password123');
-    expect(res.error).toBe('Email already registered');
+    expect(res.error).toBe('Email already exists');
     expect(res.user).toBeNull();
   });
 
